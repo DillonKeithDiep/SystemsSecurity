@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
     int int_input;
     int a, b, c, d; /* other variables, not used here.*/
     // add some redundant variables to move memory around (avoiding 0x00, 0x0c, etc)
-    int* buffer=(int*)malloc(2*sizeof(int));
+    char* buffer=(char*)malloc(1);
     
     /* The secret value is stored on the heap */
     secret = (int *) malloc(2*sizeof(int));

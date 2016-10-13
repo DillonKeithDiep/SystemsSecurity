@@ -1,0 +1,3 @@
+#!/bin/bash
+xxd -p -r file.hex > file
+echo -n ".%10\$s" >> file

