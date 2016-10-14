@@ -1,0 +1,9 @@
+The variable secret's address is 0xbfe9add0 (on stack)
+The variable secret's value is 0x 95c1018 (on heap)
+secret[0]'s address is 0x 95c1018 (on heap)
+secret[1]'s address is 0x 95c101c (on heap)
+Please enter a string
+\	%10$s
+\
+The original secrets: 0x44 -- 0x55
+The new secrets:      0x44 -- 0x55
