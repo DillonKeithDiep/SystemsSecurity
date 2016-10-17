@@ -120,8 +120,6 @@ def writeToAddress(p, address, data, writeData):
     else:
         return False
     
-    
-    
 
 def readSecret(FILE):
     p = spawnProcess(FILE)
@@ -141,9 +139,11 @@ def writeSecret(FILE, writeData):
      
 ###
 FILENAME = "./formatstr-root"
-
-#aslr = pexpect.run("echo 'dees' | sudo -kS sysctl -w kernel.randomize_va_space=2")
-#print "[ASLR On]: "+aslr
+aslr = pexpect.spawn('sudo -kS sysctl -w kernel.randomize_va_space=2')
+aslr.sendline('dees')
+aslr.read()
+aslr.close()
+print "[TASK1] Using file name: "+FILENAME+", ASLR on"
 
 print "[TASK 1b]: Reading from address using previous input"
 raw_input("Press Enter to continue...")
@@ -154,9 +154,11 @@ writeSecret(FILENAME, 400)
 
 ###
 FILENAME = "./formatstr-root2"
-
-#aslr = pexpect.run("echo 'dees' | sudo -kS sysctl -w kernel.randomize_va_space=0")
-#print "[ASLR OFF]: "+aslr
+aslr = pexpect.spawn('sudo -kS sysctl -w kernel.randomize_va_space=0')
+aslr.sendline('dees')
+aslr.read()
+aslr.close()
+print "[TASK2] Using file name: "+FILENAME+", ASLR off"
 
 print "[TASK 2b]: Reading from address using input string without ASLR"
 raw_input("Press Enter to continue...")
@@ -166,8 +168,11 @@ raw_input("Press Enter to continue...")
 writeSecret(FILENAME, 400)
 
 ###
-#aslr = pexpect.run("echo 'dees' | sudo -kS sysctl -w kernel.randomize_va_space=2")
-#print "[ASLR On]: "+aslr
+aslr = pexpect.spawn('sudo -kS sysctl -w kernel.randomize_va_space=2')
+aslr.sendline('dees')
+aslr.read()
+aslr.close()
+print "[TASK3] Using file name: "+FILENAME+", ASLR on"
 
 print "[TASK 3b]: Reading from address using input string with ASLR"
 raw_input("Press Enter to continue...")
