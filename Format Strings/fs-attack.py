@@ -42,7 +42,7 @@ def checkAddress(address):
     addr = [address[0:2], address[2:4], address[4:6], address[6:8]]
     invalids = ["00", "0C", "0A", "0D", "09", "20"]
     if any(elem in addr for elem in invalids):
-        print "Certain control characters (00, 0C, 0A, 0D, 09, 08, etc) can be invalid. Retrying."
+        print "Certain control characters (00, 0C, 0A, 0D, 09, 20, etc) can be invalid. Retrying."
         return False
     else:
         return True
